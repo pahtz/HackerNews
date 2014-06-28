@@ -39,10 +39,23 @@ class MainViewController: UIViewController, UITableViewDataSource {
     // MARK: Functions
     
     func configureUI() {
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 44
+        
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.addObserver(self, selector:"preferredContentSizeChanged:", name:UIContentSizeCategoryDidChangeNotification, object: nil)
+        
         refreshControl.addTarget(self, action: "fetchPosts", forControlEvents: .ValueChanged)
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to Refresh")
         tableView.insertSubview(refreshControl, atIndex: 0)
     }
+    
+    func preferredContentSizeChanged(_: NSNotification)
+    {
+        println("Content Size changed")
+        tableView.setNeedsLayout()
+    }
+    
     
     func fetchPosts() {
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true;
@@ -83,6 +96,7 @@ class MainViewController: UIViewController, UITableViewDataSource {
             stylePostCellAsRead(cell)
         }
         
+        cell.textLabel.numberOfLines = 0
         cell.textLabel.text = post.Title
         cell.detailTextLabel.text = "\(post.Points) points by \(post.Username)"
         
